@@ -98,7 +98,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
   void initState() {
     super.initState();
     _taskList = DatabaseHelper.instance.getTaskMapList();
-    // TODO: implement initState
+
     super.initState();
     _updateTaskList();
   }
