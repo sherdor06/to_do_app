@@ -5,9 +5,8 @@ import 'package:to_do_app/database_helper.dart';
 import 'package:to_do_app/task.dart';
 
 class AddTaskScreen extends StatefulWidget {
-  final Function? updateTaskList;
 
-  const AddTaskScreen({super.key, this.updateTaskList});
+  const AddTaskScreen({super.key});
 
   @override
   State<AddTaskScreen> createState() => _AddTaskScreenState();
@@ -49,7 +48,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       );
 
       await DatabaseHelper.instance.insertTask(task);
-      widget.updateTaskList?.call();
+
       Navigator.pop(context);
     }
   }

@@ -50,15 +50,18 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Map<String, dynamic>>?> getTaskMapList() async {
-    //getTaskMapList task_table xonasidagi BARCHA tasklarni olib keladi,faqat O‘QISH (READ) qiladi
-    Database? db = await this.db;
-    // database ulanishini oladi (agar ochilmagan bo‘lsa ochadi)
-    final List<Map<String, Object?>>? result = await db?.query(taskTable);
-    // SELECT * FROM task_table
-    return result; // barcha tasklarni Map ko‘rinishida qaytaradi
-  }
+  Future<List<Map<String, dynamic>>> getTaskMapList() async {
+    final db = await this.db;
 
+    if (db == null) {
+      return [];
+    }
+
+    final List<Map<String, dynamic>> result =
+    await db.query(taskTable);
+
+    return result;
+  }
   Future<int?> getTaskList(List<Task> taskList) async {
     final List<Map<String, dynamic>>? taskMapList = await getTaskMapList();
     final List<Task> taskList = [];
