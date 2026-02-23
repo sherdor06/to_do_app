@@ -13,12 +13,8 @@ class TaskListScreen extends StatefulWidget {
 class _TaskListScreenState extends State<TaskListScreen> {
   Widget buildItem(Task task) {
     return ListTile(
-      title: Text(
-        task.title!,
-),
-      subtitle: Text(
-        task.date,
-      ),
+      title: Text(task.title!),
+      subtitle: Text(task.date),
       trailing: Checkbox(
         value: task.status == 0 ? false : true,
         activeColor: Theme.of(context).primaryColor,
@@ -26,26 +22,28 @@ class _TaskListScreenState extends State<TaskListScreen> {
           if (value != null) {
             task.status = value ? 1 : 0;
             await DatabaseHelper.instance.updateTask(task);
+            setState(() {
 
-            if (!mounted) return;
-
-            _updateTaskList();
+            });
           }
         },
       ),
     );
   }
-
-
-
-  void _updateTaskList() {
-    if (!mounted) return;
-    setState(() {});
-  }
+  List<Task> _tasks = [];
   @override
   void initState() {
     super.initState();
+    _updateTaskList();
   }
+
+  Future<void> _updateTaskList() async {
+    final taskMaps = await DatabaseHelper.instance.getTaskMapList();
+    setState(() {
+      _tasks = taskMaps.map((e) => Task.fromMap(e)).toList();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,26 +73,12 @@ class _TaskListScreenState extends State<TaskListScreen> {
         },
         child: Icon(Icons.add, color: Colors.green),
       ),
-      body:FutureBuilder<List<Map<String, dynamic>>>(
-    future: DatabaseHelper.instance.getTaskMapList(),
-    builder: (context, snapshot) {
-
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      }
-
-      if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        return const Center(child: Text("No tasks yet"));
-      }
-
-      final tasks = snapshot.data!;
-
-      return ListView.builder(
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          return buildItem(Task.fromMap(tasks[index]));
-        },
-      );
+      body:_tasks.isEmpty
+    ? const Center(child: Text("No tasks yet"))
+        : ListView.builder(
+    itemCount: _tasks.length,
+    itemBuilder: (context, index) {
+    return buildItem(_tasks[index]);
     },
     ),
     );
