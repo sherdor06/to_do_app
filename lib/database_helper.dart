@@ -15,6 +15,7 @@ class DatabaseHelper {
   String columnId = 'id';
   String columnTitle = 'title';
   String columnDate = 'date';
+  String columnTime = 'time';
   String columnPriority = 'priority';
   String columnStatus = 'status';
 
@@ -32,7 +33,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'todolist.db');
     final todolistDb = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreateDb,
     );
     return todolistDb;
@@ -45,6 +46,7 @@ class DatabaseHelper {
       '$columnId INTEGER PRIMARY KEY AUTOINCREMENT, '
       '$columnTitle TEXT, '
       '$columnDate TEXT, '
+      '$columnTime TEXT, '
       '$columnPriority TEXT, '
       '$columnStatus INTEGER)',
     );
@@ -63,9 +65,9 @@ class DatabaseHelper {
     return result;
   }
   Future<int?> getTaskList(List<Task> taskList) async {
-    final List<Map<String, dynamic>>? taskMapList = await getTaskMapList();
+    final List<Map<String, dynamic>> taskMapList = await getTaskMapList();
     final List<Task> taskList = [];
-    taskMapList?.forEach((element) {
+    taskMapList.forEach((element) {
       taskList.add(Task.fromMap(element));
     });
     return null;
@@ -73,6 +75,9 @@ class DatabaseHelper {
 
   Future<int?> insertTask(Task task) async {
     Database? db = await this.db;
+    if (db == null) throw Exception("DB not open");
+
+    print("Insert qilinayotgan task: ${task.toMap()}");
     final int? result = await db?.insert(taskTable, task.toMap());
     return result;
   }
@@ -98,3 +103,4 @@ class DatabaseHelper {
     return result;
   }
 }
+

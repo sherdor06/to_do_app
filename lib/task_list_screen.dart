@@ -16,10 +16,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
       key: Key(task.id.toString()),
       background: Container(
         color: Colors.red,
-        child: const Icon(
-          Icons.delete,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.delete, color: Colors.white),
       ),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) async {
@@ -29,8 +26,34 @@ class _TaskListScreenState extends State<TaskListScreen> {
         });
       },
       child: ListTile(
-        title: Text(task.title!),
-        subtitle: Text(task.date),
+        title: Text(
+          task.title!,
+          maxLines: 3,
+          style: TextStyle(
+            decoration: task.status == 0
+                ? TextDecoration.none
+                : TextDecoration.lineThrough,
+            color: task.status == 0 ? Colors.black : Colors.grey,
+            fontSize: 20,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              task.time,
+              style: TextStyle(
+                color: task.status == 0 ? Colors.red : Colors.grey,
+              ),
+            ),
+            Text(
+              task.date,
+              style: TextStyle(
+                color: task.status == 0 ? Colors.red : Colors.grey,
+              ),
+            ),
+          ],
+        ),
         trailing: Checkbox(
           value: task.status == 0 ? false : true,
           activeColor: Theme.of(context).primaryColor,
@@ -38,16 +61,16 @@ class _TaskListScreenState extends State<TaskListScreen> {
             if (value != null) {
               task.status = value ? 1 : 0;
               await DatabaseHelper.instance.updateTask(task);
-              setState(() {
-
-              });
+              setState(() {});
             }
           },
         ),
       ),
     );
   }
+
   List<Task> _tasks = [];
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +83,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
       _tasks = taskMaps.map((e) => Task.fromMap(e)).toList();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -90,14 +112,14 @@ class _TaskListScreenState extends State<TaskListScreen> {
         },
         child: Icon(Icons.add, color: Colors.green),
       ),
-      body:_tasks.isEmpty
-    ? const Center(child: Text("No tasks yet"))
-        : ListView.builder(
-    itemCount: _tasks.length,
-    itemBuilder: (context, index) {
-    return buildItem(_tasks[index]);
-    },
-    ),
+      body: _tasks.isEmpty
+          ? const Center(child: Text("No tasks yet"))
+          : ListView.builder(
+              itemCount: _tasks.length,
+              itemBuilder: (context, index) {
+                return buildItem(_tasks[index]);
+              },
+            ),
     );
   }
 }
