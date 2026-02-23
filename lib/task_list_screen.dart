@@ -12,21 +12,38 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreenState extends State<TaskListScreen> {
   Widget buildItem(Task task) {
-    return ListTile(
-      title: Text(task.title!),
-      subtitle: Text(task.date),
-      trailing: Checkbox(
-        value: task.status == 0 ? false : true,
-        activeColor: Theme.of(context).primaryColor,
-        onChanged: (bool? value) async {
-          if (value != null) {
-            task.status = value ? 1 : 0;
-            await DatabaseHelper.instance.updateTask(task);
-            setState(() {
+    return Dismissible(
+      key: Key(task.id.toString()),
+      background: Container(
+        color: Colors.red,
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+        ),
+      ),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) async {
+        await DatabaseHelper.instance.deleteTask(task.id!);
+        setState(() {
+          _tasks.remove(task);
+        });
+      },
+      child: ListTile(
+        title: Text(task.title!),
+        subtitle: Text(task.date),
+        trailing: Checkbox(
+          value: task.status == 0 ? false : true,
+          activeColor: Theme.of(context).primaryColor,
+          onChanged: (bool? value) async {
+            if (value != null) {
+              task.status = value ? 1 : 0;
+              await DatabaseHelper.instance.updateTask(task);
+              setState(() {
 
-            });
-          }
-        },
+              });
+            }
+          },
+        ),
       ),
     );
   }
